@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crear Boleta</title>
+    <link rel="stylesheet" href="../style.css" />
+    <script type="module" src="../scripts/crearBoleta.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Crear Boleta</h1>
+    </header>
+    <main>
+      <form id="boletaForm">
+        <label for="nombreCliente">Nombre del Cliente:</label>
+        <input type="text" id="nombreCliente" name="nombreCliente" required />
+
+        <label for="dniCliente">DNI del Cliente:</label>
+        <input type="text" id="dniCliente" name="dniCliente" required />
+
+        <label for="rucCliente">Ruc del Cliente:</label>
+        <input type="text" id="rucCliente" name="rucCliente" required />
+
+        <label for="nombreTrabajador">Nombre de quien Atiende:</label>
+        <input
+          type="text"
+          id="nombreTrabajador"
+          name="nombreTrabajador"
+          required
+        />
+        
+        <label for="dniTrabajador">DNI del Trabajador:</label>
+        <input type="text" id="dniTrabajador" name="dniTrabajador" required />
+        
+        <h2>Productos</h2>
+        <div id="productosList"></div>
+        <button type="button" id="agregarProducto">Agregar Producto</button>
+        
+        <div class="total">
+          <span>Total: S/.</span><span id="totalBoleta">0.00</span>
+        </div>
+
+        <button type="submit">Crear Boleta</button>
+      </form>
+    </main>
+    <footer>
+      <p>&copy; 2023 Tu Empresa</p>
+    </footer>
+  </body>
+</html>
