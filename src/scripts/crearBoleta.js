@@ -57,8 +57,9 @@ function addProducto() {
   
   const removeBtn = document.createElement("button");
   removeBtn.type = "button";
-  removeBtn.textContent = "Eliminar";
+  removeBtn.textContent = "Borrar";
   removeBtn.style.marginLeft = "10px";
+  removeBtn.className = "p-1 rounded-md bg-[#EF9A9A] cursor-pointer hover:bg-[#E57373] animated duration-150"
   removeBtn.addEventListener("click", () => {
     div.remove();
     actualizarTotal();
@@ -192,4 +193,10 @@ boletaForm.addEventListener("submit", (e) => {
       console.error("Error al guardar la boleta:", err);
       alert(`Error: ${err.message || 'Error desconocido al crear la boleta'}`);
     });
+    //funcion de recara de pagina
+
+    setInterval(function(){
+      location.reload()
+      boletaForm.reset()
+    }, 700)
 });
