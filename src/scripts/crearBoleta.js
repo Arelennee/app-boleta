@@ -1,3 +1,5 @@
+import generarPdf from "./crearPdf.js";
+
 const productosList = document.getElementById("productosList");
 const agregarProductoBtn = document.getElementById("agregarProducto");
 const totalBoleta = document.getElementById("totalBoleta");
@@ -23,7 +25,9 @@ fetch("http://localhost:3000/api/productos")
 
 function addProducto() {
   if (productosDisponibles.length === 0) {
-    alert("No hay productos disponibles. Asegúrate de que el servidor esté funcionando y la base de datos tenga productos.");
+    alert(
+      "No hay productos disponibles. Asegúrate de que el servidor esté funcionando y la base de datos tenga productos."
+    );
     return;
   }
 
@@ -36,14 +40,14 @@ function addProducto() {
     const option = document.createElement("option");
     option.value = prod.id; // Use correct field name from API
     const precio = parseFloat(prod.precio); // Fix: convert string price to number
-    option.textContent = `${prod.nombre} - S./${precio.toFixed(
-      2
-    )} (stock: ${prod.stock})`;
+    option.textContent = `${prod.nombre} - S./${precio.toFixed(2)} (stock: ${
+      prod.stock
+    })`;
     option.dataset.precio = precio; // Fix: store as number
     option.dataset.stock = prod.stock;
     select.appendChild(option); // Fix: append option to select, not div
   });
-  
+
   div.appendChild(select); // Move this outside the loop
 
   const inputCantidad = document.createElement("input");
@@ -54,12 +58,13 @@ function addProducto() {
 
   const spanSubtotal = document.createElement("span");
   spanSubtotal.textContent = "Subtotal: s/.0.00";
-  
+
   const removeBtn = document.createElement("button");
   removeBtn.type = "button";
   removeBtn.textContent = "Borrar";
   removeBtn.style.marginLeft = "10px";
-  removeBtn.className = "p-1 rounded-md bg-[#EF9A9A] cursor-pointer hover:bg-[#E57373] animated duration-150"
+  removeBtn.className =
+    "p-1 rounded-md bg-[#EF9A9A] cursor-pointer hover:bg-[#E57373] animated duration-150";
   removeBtn.addEventListener("click", () => {
     div.remove();
     actualizarTotal();
@@ -69,14 +74,14 @@ function addProducto() {
     const precio = parseFloat(select.selectedOptions[0].dataset.precio);
     const cantidad = parseInt(inputCantidad.value) || 0;
     const stock = parseInt(select.selectedOptions[0].dataset.stock);
-    
+
     // Validate quantity against stock
     if (cantidad > stock) {
       inputCantidad.value = stock;
       alert(`Stock insuficiente. Máximo disponible: ${stock}`);
       return;
     }
-    
+
     const subtotal = precio * cantidad;
     spanSubtotal.textContent = `Subtotal: S/.${subtotal.toFixed(2)}`;
     actualizarTotal();
@@ -166,7 +171,7 @@ boletaForm.addEventListener("submit", (e) => {
     alert("Debe agregar al menos un producto");
     return;
   }
-  
+
   if (total <= 0) {
     alert("El total debe ser mayor a 0");
     return;
@@ -181,22 +186,27 @@ boletaForm.addEventListener("submit", (e) => {
   })
     .then((res) => {
       if (!res.ok) {
-        return res.json().then(err => Promise.reject(err));
+        return res.json().then((err) => Promise.reject(err));
       }
       return res.json();
     })
     .then((data) => {
       alert(`Boleta generada con éxito. Código: ${data.codigo_boleta}`);
+      generarPdf({
+        codigoBoleta: data.codigo_boleta, // Fix: use correct property name from API response
+        nombreCliente: datosBoleta.nombre_cliente,
+        dniCliente: datosBoleta.dni_cliente,
+        rucCliente: datosBoleta.ruc_cliente,
+        nombreTrabajador: datosBoleta.nombre_trabajador,
+        dniTrabajador: datosBoleta.dni_trabajador,
+        totalBoleta: datosBoleta.total_boleta,
+        productos: datosBoleta.productos,
+        productosDisponibles: productosDisponibles, // Pass available products for PDF details
+      });
       location.reload();
     })
     .catch((err) => {
       console.error("Error al guardar la boleta:", err);
-      alert(`Error: ${err.message || 'Error desconocido al crear la boleta'}`);
+      alert(`Error: ${err.message || "Error desconocido al crear la boleta"}`);
     });
-    //funcion de recara de pagina
-
-    setInterval(function(){
-      location.reload()
-      boletaForm.reset()
-    }, 700)
 });
