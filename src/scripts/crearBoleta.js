@@ -4,67 +4,68 @@ const productosList = document.getElementById("productosList");
 const agregarProductoBtn = document.getElementById("agregarProducto");
 const totalBoleta = document.getElementById("totalBoleta");
 const boletaForm = document.getElementById("boletaForm");
+const tipoRadios = document.querySelectorAll('input[name="tipoBoleta"]');
+const seccionVenta = document.getElementById("seccionVenta");
+const seccionProforma = document.getElementById("seccionProforma");
 
 let productosDisponibles = [];
 
+// Mostrar/ocultar secciones
+tipoRadios.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    if (radio.value === "venta") {
+      seccionVenta.style.display = "block";
+      seccionProforma.style.display = "none";
+    } else {
+      seccionVenta.style.display = "none";
+      seccionProforma.style.display = "block";
+    }
+  });
+});
+
+// Carga productos
 fetch("http://localhost:3000/api/productos")
-  .then((res) => {
-    console.log("Response status:", res.status);
-    return res.json();
-  })
+  .then((res) => res.json())
   .then((data) => {
-    console.log("Products loaded:", data.length, "products");
-    console.log("First product:", data[0]); // Debug: show structure
     productosDisponibles = data;
     addProducto();
   })
   .catch((err) => {
-    console.error("Error fetching products:", err);
-    alert("Error cargando productos. Revisa la consola para más detalles.");
+    console.error("Error cargando productos:", err);
+    alert("Error al cargar productos");
   });
 
 function addProducto() {
   if (productosDisponibles.length === 0) {
-    alert(
-      "No hay productos disponibles. Asegúrate de que el servidor esté funcionando y la base de datos tenga productos."
-    );
+    alert("No hay productos disponibles.");
     return;
   }
-
   const div = document.createElement("div");
   div.className = "producto-item";
 
   const select = document.createElement("select");
-  select.name = "producto_id";
   productosDisponibles.forEach((prod) => {
     const option = document.createElement("option");
-    option.value = prod.id; // Use correct field name from API
-    const precio = parseFloat(prod.precio); // Fix: convert string price to number
-    option.textContent = `${prod.nombre} - S./${precio.toFixed(2)} (stock: ${
-      prod.stock
-    })`;
-    option.dataset.precio = precio; // Fix: store as number
+    option.value = prod.id;
+    option.textContent = `${prod.nombre} - S/.${parseFloat(prod.precio).toFixed(
+      2
+    )} (stock: ${prod.stock})`;
+    option.dataset.precio = parseFloat(prod.precio);
     option.dataset.stock = prod.stock;
-    select.appendChild(option); // Fix: append option to select, not div
+    select.appendChild(option);
   });
-
-  div.appendChild(select); // Move this outside the loop
 
   const inputCantidad = document.createElement("input");
   inputCantidad.type = "number";
-  inputCantidad.name = "cantidad";
   inputCantidad.min = "1";
   inputCantidad.placeholder = "Cantidad";
 
   const spanSubtotal = document.createElement("span");
-  spanSubtotal.textContent = "Subtotal: s/.0.00";
+  spanSubtotal.textContent = "Subtotal: S/.0.00";
 
   const removeBtn = document.createElement("button");
   removeBtn.type = "button";
   removeBtn.textContent = "Borrar";
-  removeBtn.style.marginLeft = "10px";
-  removeBtn.className =
-    "p-1 rounded-md bg-[#EF9A9A] cursor-pointer hover:bg-[#E57373] animated duration-150";
   removeBtn.addEventListener("click", () => {
     div.remove();
     actualizarTotal();
@@ -74,16 +75,12 @@ function addProducto() {
     const precio = parseFloat(select.selectedOptions[0].dataset.precio);
     const cantidad = parseInt(inputCantidad.value) || 0;
     const stock = parseInt(select.selectedOptions[0].dataset.stock);
-
-    // Validate quantity against stock
     if (cantidad > stock) {
       inputCantidad.value = stock;
       alert(`Stock insuficiente. Máximo disponible: ${stock}`);
       return;
     }
-
-    const subtotal = precio * cantidad;
-    spanSubtotal.textContent = `Subtotal: S/.${subtotal.toFixed(2)}`;
+    spanSubtotal.textContent = `Subtotal: S/.${(precio * cantidad).toFixed(2)}`;
     actualizarTotal();
   });
 
@@ -91,23 +88,18 @@ function addProducto() {
     inputCantidad.dispatchEvent(new Event("input"));
   });
 
-  div.appendChild(inputCantidad);
-  div.appendChild(spanSubtotal);
-  div.appendChild(removeBtn);
+  div.append(select, inputCantidad, spanSubtotal, removeBtn);
   productosList.appendChild(div);
 }
 
 function actualizarTotal() {
   const items = productosList.querySelectorAll(".producto-item");
   let total = 0;
-
   items.forEach((item) => {
     const select = item.querySelector("select");
-    const inputCantidad = item.querySelector("input");
-    if (select.selectedOptions[0] && inputCantidad.value) {
-      const precio = parseFloat(select.selectedOptions[0].dataset.precio);
-      const cantidad = parseInt(inputCantidad.value) || 0;
-      total += precio * cantidad;
+    const cantidad = parseInt(item.querySelector("input").value) || 0;
+    if (cantidad > 0) {
+      total += parseFloat(select.selectedOptions[0].dataset.precio) * cantidad;
     }
   });
   totalBoleta.textContent = total.toFixed(2);
@@ -115,97 +107,95 @@ function actualizarTotal() {
 
 agregarProductoBtn.addEventListener("click", addProducto);
 
+// Manejo del submit del formulario
 boletaForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const nombreCliente = document.getElementById("nombreCliente").value;
-  const dni = document.getElementById("dniCliente").value;
-  const rucCliente = document.getElementById("rucCliente").value;
-  const trabajador = document.getElementById("nombreTrabajador").value;
-  const dniTrabajador = document.getElementById("dniTrabajador").value;
+  const tipoSeleccionado = document.querySelector(
+    'input[name="tipoBoleta"]:checked'
+  ).value;
+  const nombreCliente = document.getElementById("nombreCliente").value.trim();
+  const dni = document.getElementById("dniCliente").value.trim();
+  const rucCliente = document.getElementById("rucCliente").value.trim();
+  const trabajador = document.getElementById("nombreTrabajador").value.trim();
+  const dniTrabajador = document.getElementById("dniTrabajador").value.trim();
 
-  const productos = [];
-
-  const items = productosList.querySelectorAll(".producto-item");
-
-  items.forEach((item) => {
-    const select = item.querySelector("select");
-    const inputCantidad = item.querySelector("input");
-    const productoId = parseInt(select.value);
-    const cantidad = parseInt(inputCantidad.value);
-
-    if (cantidad > 0) {
-      productos.push({ id_producto: productoId, cantidad });
-    }
-  });
-
-  // Calculate total from current form values
-  let total = 0;
-  items.forEach((item) => {
-    const select = item.querySelector("select");
-    const inputCantidad = item.querySelector("input");
-    if (select.selectedOptions[0] && inputCantidad.value) {
-      const precio = parseFloat(select.selectedOptions[0].dataset.precio);
-      const cantidad = parseInt(inputCantidad.value) || 0;
-      total += precio * cantidad;
-    }
-  });
   const datosBoleta = {
     nombre_cliente: nombreCliente,
     dni_cliente: dni,
     ruc_cliente: rucCliente,
     nombre_trabajador: trabajador,
     dni_trabajador: dniTrabajador,
-    total_boleta: total,
-    estado: "activa",
-    productos: productos,
+    estado: "pendiente",
+    tipo: tipoSeleccionado,
+    total_boleta: 0,
   };
 
-  // Debug: log what we're sending
-  console.log("Sending boleta data:", datosBoleta);
-  console.log("Products array:", productos);
-
-  // Validate form before submitting
-  if (productos.length === 0) {
-    alert("Debe agregar al menos un producto");
-    return;
+  if (tipoSeleccionado === "venta") {
+    const productos = [];
+    let total = 0;
+    productosList.querySelectorAll(".producto-item").forEach((item) => {
+      const select = item.querySelector("select");
+      const cantidad = parseInt(item.querySelector("input").value) || 0;
+      if (cantidad > 0) {
+        productos.push({ id_producto: parseInt(select.value), cantidad });
+        total +=
+          parseFloat(select.selectedOptions[0].dataset.precio) * cantidad;
+      }
+    });
+    if (productos.length === 0) {
+      alert("Debe agregar al menos un producto.");
+      return;
+    }
+    if (total <= 0) {
+      alert("El total debe ser mayor a 0.");
+      return;
+    }
+    datosBoleta.productos = productos;
+    datosBoleta.total_boleta = total;
+  } else if (tipoSeleccionado === "proforma") {
+    const descripcion = document
+      .getElementById("descripcionProforma")
+      .value.trim();
+    const precio = parseFloat(document.getElementById("precioProforma").value);
+    if (!descripcion || isNaN(precio) || precio <= 0) {
+      alert("Descripción válida y precio mayor a 0 requeridos para proforma.");
+      return;
+    }
+    datosBoleta.description = descripcion;
+    datosBoleta.total_boleta = precio;
   }
 
-  if (total <= 0) {
-    alert("El total debe ser mayor a 0");
-    return;
-  }
+  console.log("Enviando boleta:", datosBoleta);
 
   fetch("http://localhost:3000/api/boletas", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(datosBoleta),
   })
     .then((res) => {
-      if (!res.ok) {
-        return res.json().then((err) => Promise.reject(err));
-      }
+      if (!res.ok) return res.json().then((err) => Promise.reject(err));
       return res.json();
     })
     .then((data) => {
-      alert(`Boleta generada con éxito. Código: ${data.codigo_boleta}`);
+      alert(`Boleta creada. Código: ${data.codigo_boleta}`);
       generarPdf({
+        tipo: tipoSeleccionado,
         codigoBoleta: data.codigo_boleta,
-        nombreCliente: datosBoleta.nombre_cliente,
-        dniCliente: datosBoleta.dni_cliente,
-        rucCliente: datosBoleta.ruc_cliente,
-        nombreTrabajador: datosBoleta.nombre_trabajador,
-        dniTrabajador: datosBoleta.dni_trabajador,
+        nombreCliente,
+        dniCliente: dni,
+        rucCliente,
+        nombreTrabajador: trabajador,
+        dniTrabajador,
         totalBoleta: datosBoleta.total_boleta,
-        productos: datosBoleta.productos,
-        productosDisponibles: productosDisponibles,
+        productos: datosBoleta.productos || [],
+        descripcion: datosBoleta.description || "",
+        productosDisponibles,
       });
       location.reload();
     })
     .catch((err) => {
-      console.error("Error al guardar la boleta:", err);
-      alert(`Error: ${err.message || "Error desconocido al crear la boleta"}`);
+      console.error("Error creando boleta:", err);
+      alert(err.message || "Error desconocido al crear boleta.");
     });
 });

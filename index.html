@@ -4,53 +4,110 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Generador de Boletas</title>
-    <link rel="stylesheet" href="./src/style.css">
+    <link rel="stylesheet" href="./src/style.css" />
     <script type="module" src="./src/scripts/crearBoleta.js" defer></script>
   </head>
   <body>
-    <main class="flex h-screen w-screen justify-center items-start pt-12 bg-[#D6CAF1]">
+    <main
+      class="flex h-screen w-screen justify-center items-start pt-12 bg-[#D6CAF1]"
+    >
       <div class="flex flex-col items-center bg-[#4A4596] rounded-xl">
-        <form id="boletaForm" class="">
-          <div class=" flex flex-col items-center p-7 gap-3">
-            <div class="flex flex-row gap-1.5 justify-center p-3 bg-[#9885C5] rounded-md">
-              <div>
-                <label class="text-[#493382]">Nombre cliente: </label>
-                <input type="text" name="nombreCliente" id="nombreCliente" class="bg-[#F8F4FF] outline-1 outline-[#9885C5] p-2 rounded-md" required/>
+        <label>
+          <input type="radio" name="tipoBoleta" value="venta" checked />
+          Boleta de Venta
+        </label>
+        <label>
+          <input type="radio" name="tipoBoleta" value="proforma" checked />
+          Boleta Proforma
+        </label>
+        <div id="seccionVenta">
+          <form id="boletaForm" class="">
+            <div class="flex flex-col items-center p-7 gap-3">
+              <div
+                class="flex flex-row gap-1.5 justify-center p-3 bg-[#9885C5] rounded-md"
+              >
+                <div>
+                  <label class="text-[#493382]">Nombre cliente: </label>
+                  <input
+                    type="text"
+                    name="nombreCliente"
+                    id="nombreCliente"
+                    class="bg-[#F8F4FF] outline-1 outline-[#9885C5] p-2 rounded-md"
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="text-[#493382]">DNI cliente:</label>
+                  <input
+                    type="text"
+                    name="dniCliente"
+                    id="dniCliente"
+                    class="bg-[#F8F4FF] outline-1 outline-[#9885C5] p-2 rounded-md"
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="text-[#493382]">R.U.C cliente:</label>
+                  <input
+                    type="text"
+                    name="rucCliente"
+                    id="rucCliente"
+                    class="bg-[#F8F4FF] outline-1 outline-[#9885C5] p-2 rounded-md"
+                    required
+                  />
+                </div>
               </div>
-              <div>
-                <label class="text-[#493382]">DNI cliente:</label>
-                <input type="text" name="dniCliente" id="dniCliente" class="bg-[#F8F4FF] outline-1 outline-[#9885C5] p-2 rounded-md" required />
+              <div
+                class="flex flex-row gap-1.5 justify-center p-3 bg-[#9885C5] rounded-md"
+              >
+                <div>
+                  <label class="text-[#493382]">Nombre Trabajador</label>
+                  <input
+                    type="text"
+                    name="nombreTrabajador"
+                    id="nombreTrabajador"
+                    class="bg-[#F8F4FF] outline-1 outline-[#9885C5] p-2 rounded-md"
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="text-[#493382]">DNI Trabajador</label>
+                  <input
+                    type="text"
+                    name="dniTrabajador"
+                    id="dniTrabajador"
+                    class="bg-[#F8F4FF] outline-1 outline-[#9885C5] p-2 rounded-md"
+                    required
+                  />
+                </div>
               </div>
-              <div>
-                <label class="text-[#493382]">R.U.C cliente:</label>
-                <input type="text" name="rucCliente" id="rucCliente" class="bg-[#F8F4FF] outline-1 outline-[#9885C5] p-2 rounded-md" required />
-              </div>
-            </div>
-            <div class="flex flex-row gap-1.5 justify-center p-3 bg-[#9885C5] rounded-md">
-              <div>
-              <label class="text-[#493382]">Nombre Trabajador</label>
-              <input
-                type="text"
-                name="nombreTrabajador"
-                id="nombreTrabajador"
-                class="bg-[#F8F4FF] outline-1 outline-[#9885C5] p-2 rounded-md"
-                required
-              />
-            </div>
-            <div>
-              <label class="text-[#493382]">DNI Trabajador</label>
-              <input type="text" name="dniTrabajador" id="dniTrabajador" class="bg-[#F8F4FF] outline-1 outline-[#9885C5] p-2 rounded-md" required />
-            </div>
-            </div>
               <h2 class="text-center text-2xl text-[#493382]">Productos</h2>
-              <div id="productosList" class="flex flex-col justify-center bg-[#9885C5] p-3 gap-1.5 rounded-md"></div>
-              <button id="agregarProducto" type="button" class="w-3xs bg-[#A5D6A7] outline-1 rounded-md text-lg p-0.5 cursor-pointer hover:bg-[#81C784] animated duration-150">Agregar Producto</button>
+              <div
+                id="productosList"
+                class="flex flex-col justify-center bg-[#9885C5] p-3 gap-1.5 rounded-md"
+              ></div>
+              <button
+                id="agregarProducto"
+                type="button"
+                class="w-3xs bg-[#A5D6A7] outline-1 rounded-md text-lg p-0.5 cursor-pointer hover:bg-[#81C784] animated duration-150"
+              >
+                Agregar Producto
+              </button>
               <div class="total">
                 <span id="totalBoleta">0.00</span>
               </div>
-              <button type="submit" class="w-2xs bg-[#493382] rounded-md text-lg p-1 cursor-pointer hover:bg-[#4A4596] hover:text-[#FFFFFF] animated duration-200">Generar boleta</button>
-          </div>
-        </form>
+              <button
+                type="submit"
+                class="w-2xs bg-[#493382] rounded-md text-lg p-1 cursor-pointer hover:bg-[#4A4596] hover:text-[#FFFFFF] animated duration-200"
+              >
+                Generar boleta
+              </button>
+            </div>
+          </form>
+        </div>
+        <div id="seccionProforma" style="display: none">
+          <!--inputs o form para ingresar los datos de proforma-->
+        </div>
       </div>
     </main>
   </body>
