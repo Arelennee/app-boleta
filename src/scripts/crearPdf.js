@@ -1,5 +1,7 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts.js";
+import imagen from "../img/imagen.js";
+import rucEmpresa from "../middleware/ruc.js";
 pdfMake.vfs = pdfFonts.vfs;
 
 export default function generarPdf({
@@ -15,21 +17,37 @@ export default function generarPdf({
 }) {
   const docDefinition = {
     content: [
-      { text: codigoBoleta, style: "header" },
       {
-        text: `Cliente: ${nombreCliente}`,
-        style: "subheader",
-        margin: [0, 10, 0, 10],
+        columns: [
+          {
+            image: imagen,
+            width: 225,
+            height: 123.75,
+            margin: [0, 0, 0, 10],
+          },
+          {
+            width: "*",
+            stack: [
+              { text: `R.U.C ${rucEmpresa}` },
+              { text: "Boleta de Pago" },
+              { text: codigoBoleta },
+            ],
+            margin: [0, 0, 10, 0],
+            alignment: "right",
+          },
+        ],
+        columnGap: 10,
       },
       {
-        text: `DNI Cliente: ${dniCliente}`,
-        style: "subheader",
-        margin: [0, 10, 0, 10],
-      },
-      {
-        text: `RUC Cliente: ${rucCliente}`,
-        style: "subheader",
-        margin: [0, 10, 0, 10],
+        stack: [
+          {
+            columns: [
+              { text: `Cliente: ${nombreCliente}` },
+              { text: `DNI Cliente: ${dniCliente}` },
+            ],
+          },
+          { text: `R.U.C Cliente: ${rucCliente}` },
+        ],
       },
       {
         text: `Trabajador: ${nombreTrabajador}`,

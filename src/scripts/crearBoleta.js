@@ -150,7 +150,6 @@ boletaForm.addEventListener("submit", (e) => {
       total += precio * cantidad;
     }
   });
-
   const datosBoleta = {
     nombre_cliente: nombreCliente,
     dni_cliente: dni,
@@ -193,7 +192,7 @@ boletaForm.addEventListener("submit", (e) => {
     .then((data) => {
       alert(`Boleta generada con éxito. Código: ${data.codigo_boleta}`);
       generarPdf({
-        codigoBoleta: data.codigo_boleta, // Fix: use correct property name from API response
+        codigoBoleta: data.codigo_boleta,
         nombreCliente: datosBoleta.nombre_cliente,
         dniCliente: datosBoleta.dni_cliente,
         rucCliente: datosBoleta.ruc_cliente,
@@ -201,7 +200,7 @@ boletaForm.addEventListener("submit", (e) => {
         dniTrabajador: datosBoleta.dni_trabajador,
         totalBoleta: datosBoleta.total_boleta,
         productos: datosBoleta.productos,
-        productosDisponibles: productosDisponibles, // Pass available products for PDF details
+        productosDisponibles: productosDisponibles,
       });
       location.reload();
     })
